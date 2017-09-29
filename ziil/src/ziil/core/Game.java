@@ -1,5 +1,6 @@
 package ziil.core;
 
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -16,8 +17,10 @@ public class Game
 	private static final String GO_COMMAND = "go";
 	private static final String QUIT_COMMAND = "quit";
 	private static final String HELP_COMMAND = "help";
+	private static final String EVALUATE_COMMAND = "evaluate";
     private Parser parser;
     private Room currentRoom;
+    private Room endRoom;
     private AbsoluteDirection currentDirection;
     
     public static void main(String[] args) {
@@ -39,8 +42,9 @@ public class Game
      */
     private void createRooms()
     {
-    	RoomGenerator generator = new RoomGenerator(MAZE_SIZE);
-    	currentRoom = generator.generateRooms();
+    	Maze maze = new Maze(MAZE_SIZE);
+    	currentRoom = maze.getStartingRoom();
+    	endRoom = maze.getEndRoom();
     }
 
     /**
@@ -84,14 +88,17 @@ public class Game
 
         String commandWord = command.getCommandWord();
         switch (commandWord) {
-        	case "help":
+        	case HELP_COMMAND:
 	        	printHelp();
 	        	break;
-        	case "go":
+        	case GO_COMMAND:
         		finished = goRoom(command);
         		break;
-        	case "quit":
+        	case QUIT_COMMAND:
         		finished = true;
+        		break;
+        	case EVALUATE_COMMAND:
+        		evaluatePath();
         		break;
     		default:
                 System.out.println("I don't know what you mean...");
@@ -112,7 +119,8 @@ public class Game
         System.out.println("You are lost. You are alone. You wander");
         System.out.println("around at the university.");
         System.out.println();
-        System.out.println("Your command words are: " + GO_COMMAND + " " + QUIT_COMMAND + " " + HELP_COMMAND);
+        System.out.println("Your command words are: " + GO_COMMAND + " " + QUIT_COMMAND + " " + HELP_COMMAND
+        		+ " " + EVALUATE_COMMAND);
     }
 
     /** 
@@ -150,6 +158,16 @@ public class Game
         currentDirection = absDirection;
         System.out.println(getRoomDescription(currentRoom, currentDirection));
         return false;
+    }
+    
+    private void evaluatePath() {
+    	PathFinder pathFinder = new PathFinder();
+    	Optional<Integer> pathLength = pathFinder.calculateShortestPathLength(currentRoom, endRoom);
+    	if (pathLength.isPresent()) {
+    		System.out.println("The shortest path to the end are " + pathLength.get() + " doors.");
+    	} else {
+    		System.out.println("Can't find a path to the end!");
+    	}
     }
 
     private String getRoomDescription(Room room, AbsoluteDirection direction)

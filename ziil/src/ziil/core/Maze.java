@@ -13,7 +13,7 @@ import java.util.Stack;
  * @author Manuel
  *
  */
-public class RoomGenerator {
+public class Maze {
 	private static final int MIN_SIZE = 2;
 	private static final String[] ROOM_DESCRIPTIONS = { "in an empty room" };
 	private static final Random random = new Random();
@@ -21,28 +21,47 @@ public class RoomGenerator {
 	private Map<Room, Point> roomPositions;
 	
 	/**
-	 * Creates a room generator
+	 * Creates a maze
 	 * @param size The size of the maze (one length). The maze will have size*size rooms
 	 */
-	public RoomGenerator(int size) {
+	public Maze(int size) {
 		if (size < MIN_SIZE) {
 			throw new IllegalArgumentException("Size " + size + " is too low!");
 		}
 		this.size = size;
+
+		createRooms();
+		connectRooms();
+		setEndRoom();
+	}
+	
+	public Room getStartingRoom() {
+		return roomPositions
+				.entrySet()
+				.stream()
+				.filter(roomEntry -> roomEntry.getValue().getX() == 0 && roomEntry.getValue().getY() == 0)
+				.findFirst()
+				.get()
+				.getKey();
+	}
+	
+	public Room getEndRoom() {
+		int maxXY = size - 1;
+		
+		return roomPositions
+				.entrySet()
+				.stream()
+				.filter(roomEntry -> roomEntry.getValue().getX() == maxXY && roomEntry.getValue().getY() == maxXY)
+				.findFirst()
+				.get()
+				.getKey();
 	}
 
-	/**
-	 * Generates room in a maze-like structure.
-	 * @return The starting room
-	 */
-	public Room generateRooms() {
-		createRooms(size);
-		
-		Room startingRoom = getStartingRoom();
+	private void connectRooms() {
 		Stack<Room> stack = new Stack<Room>();
 		Set<Room> visitedRooms = new HashSet<>();
 		
-		Room currentRoom = startingRoom;
+		Room currentRoom = getStartingRoom();
 		
 		while (visitedRooms.size() != roomPositions.size()) {
 			visitedRooms.add(currentRoom);
@@ -58,13 +77,9 @@ public class RoomGenerator {
 				currentRoom = stack.pop();
 			}
 		}
-		
-		setEndRoom();
-		
-		return startingRoom;
 	}
 	
-	private void createRooms(int size){
+	private void createRooms() {
 		roomPositions = new HashMap<>();
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
@@ -97,27 +112,8 @@ public class RoomGenerator {
 		return (diffX == 1 && diffY == 0) || (diffY == 1 && diffX == 0);
 	}
 	
-	private Room getStartingRoom() {
-		return roomPositions
-				.entrySet()
-				.stream()
-				.filter(roomEntry -> roomEntry.getValue().getX() == 0 && roomEntry.getValue().getY() == 0)
-				.findFirst()
-				.get()
-				.getKey();
-	}
-	
 	private void setEndRoom() {
-		int maxXY = size - 1;
-		
-		Room endRoom = roomPositions
-				.entrySet()
-				.stream()
-				.filter(roomEntry -> roomEntry.getValue().getX() == maxXY && roomEntry.getValue().getY() == maxXY)
-				.findFirst()
-				.get()
-				.getKey();
-		
+		Room endRoom = getEndRoom();
 		endRoom.setEndRoom();
 	}
 	
