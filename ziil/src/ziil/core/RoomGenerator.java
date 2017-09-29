@@ -17,20 +17,28 @@ public class RoomGenerator {
 	private static final int MIN_SIZE = 2;
 	private static final String[] ROOM_DESCRIPTIONS = { "in an empty room" };
 	private static final Random random = new Random();
-
+	private final int size;
+	private Map<Room, Point> roomPositions;
+	
 	/**
-	 * Generates room in a maze-like structure.
+	 * Creates a room generator
 	 * @param size The size of the maze (one length). The maze will have size*size rooms
-	 * @return The starting room
 	 */
-	public Room generateRooms(int size) {
+	public RoomGenerator(int size) {
 		if (size < MIN_SIZE) {
 			throw new IllegalArgumentException("Size " + size + " is too low!");
 		}
+		this.size = size;
+	}
+
+	/**
+	 * Generates room in a maze-like structure.
+	 * @return The starting room
+	 */
+	public Room generateRooms() {
+		createRooms(size);
 		
-		Map<Room, Point> roomPositions = createRooms(size);
-		Room startingRoom = getStartingRoom(roomPositions);
-		
+		Room startingRoom = getStartingRoom();
 		Stack<Room> stack = new Stack<Room>();
 		Set<Room> visitedRooms = new HashSet<>();
 		
@@ -38,7 +46,7 @@ public class RoomGenerator {
 		
 		while (visitedRooms.size() != roomPositions.size()) {
 			visitedRooms.add(currentRoom);
-			Room neighbour = getRandomUnvisitedNeighbour(currentRoom, roomPositions, visitedRooms);
+			Room neighbour = getRandomUnvisitedNeighbour(currentRoom, visitedRooms);
 			if (neighbour != null) {
 				stack.push(currentRoom);
 				Point currentPosition = roomPositions.get(currentRoom);
@@ -51,23 +59,22 @@ public class RoomGenerator {
 			}
 		}
 		
-		setEndRoom(roomPositions, size);
+		setEndRoom();
 		
 		return startingRoom;
 	}
 	
-	private Map<Room, Point> createRooms(int size){
-		Map<Room, Point> roomPositions = new HashMap<>();
+	private void createRooms(int size){
+		roomPositions = new HashMap<>();
 		for (int y = 0; y < size; y++) {
 			for (int x = 0; x < size; x++) {
 				Room room = new Room(getRandomRoomDescription());
 				roomPositions.put(room, new Point(x, y));
 			}
 		}
-		return roomPositions;
 	}
 	
-	private Room getRandomUnvisitedNeighbour(Room room, Map<Room, Point> roomPositions, Set<Room> visitedRooms) {
+	private Room getRandomUnvisitedNeighbour(Room room, Set<Room> visitedRooms) {
 		Point roomPosition = roomPositions.get(room);
 		Room[] possibleRooms = roomPositions
 				.entrySet()
@@ -90,7 +97,7 @@ public class RoomGenerator {
 		return (diffX == 1 && diffY == 0) || (diffY == 1 && diffX == 0);
 	}
 	
-	private Room getStartingRoom(Map<Room, Point> roomPositions) {
+	private Room getStartingRoom() {
 		return roomPositions
 				.entrySet()
 				.stream()
@@ -100,7 +107,7 @@ public class RoomGenerator {
 				.getKey();
 	}
 	
-	private void setEndRoom(Map<Room,Point> roomPositions, int size) {
+	private void setEndRoom() {
 		int maxXY = size - 1;
 		
 		Room endRoom = roomPositions

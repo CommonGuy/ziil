@@ -39,8 +39,8 @@ public class Game
      */
     private void createRooms()
     {
-    	RoomGenerator generator = new RoomGenerator();
-    	currentRoom = generator.generateRooms(MAZE_SIZE);
+    	RoomGenerator generator = new RoomGenerator(MAZE_SIZE);
+    	currentRoom = generator.generateRooms();
     }
 
     /**
