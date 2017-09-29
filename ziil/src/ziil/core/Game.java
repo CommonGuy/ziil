@@ -12,7 +12,7 @@ import java.util.Set;
 
 public class Game 
 {
-	private static final int MAZE_SIZE = 3;
+	private static final int MAZE_SIZE = 5;
 	private static final String GO_COMMAND = "go";
 	private static final String QUIT_COMMAND = "quit";
 	private static final String HELP_COMMAND = "help";

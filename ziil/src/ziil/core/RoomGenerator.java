@@ -14,7 +14,7 @@ import java.util.Stack;
  *
  */
 public class RoomGenerator {
-	private static final int MIN_SIZE = 5;
+	private static final int MIN_SIZE = 2;
 	private static final String[] ROOM_DESCRIPTIONS = { "in an empty room" };
 	private static final Random random = new Random();
 
