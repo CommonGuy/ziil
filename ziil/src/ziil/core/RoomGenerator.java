@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.Stack;
@@ -15,21 +14,22 @@ import java.util.Stack;
  *
  */
 public class RoomGenerator {
+	private static final int MIN_SIZE = 5;
 	private static final String[] ROOM_DESCRIPTIONS = { "in an empty room" };
 	private static final Random random = new Random();
 
 	/**
 	 * Generates room in a maze-like structure.
 	 * @param size The size of the maze (one length). The maze will have size*size rooms
-	 * @return The starting room, which is in the middle of the maze
+	 * @return The starting room
 	 */
 	public Room generateRooms(int size) {
-		if (size < 5) {
-			throw new IllegalArgumentException("Size " + size + " is way too low!");
+		if (size < MIN_SIZE) {
+			throw new IllegalArgumentException("Size " + size + " is too low!");
 		}
 		
 		Map<Room, Point> roomPositions = createRooms(size);
-		Room startingRoom = getStartingRoom(roomPositions, size);
+		Room startingRoom = getStartingRoom(roomPositions);
 		
 		Stack<Room> stack = new Stack<Room>();
 		Set<Room> visitedRooms = new HashSet<>();
@@ -51,7 +51,7 @@ public class RoomGenerator {
 			}
 		}
 		
-		setEndRooms(roomPositions, size);
+		setEndRoom(roomPositions, size);
 		
 		return startingRoom;
 	}
@@ -90,27 +90,28 @@ public class RoomGenerator {
 		return (diffX == 1 && diffY == 0) || (diffY == 1 && diffX == 0);
 	}
 	
-	private Room getStartingRoom(Map<Room, Point> roomPositions, int size) {
-		int middle = size / 2;
+	private Room getStartingRoom(Map<Room, Point> roomPositions) {
 		return roomPositions
 				.entrySet()
 				.stream()
-				.filter(roomEntry -> roomEntry.getValue().getX() == middle && roomEntry.getValue().getY() == middle)
+				.filter(roomEntry -> roomEntry.getValue().getX() == 0 && roomEntry.getValue().getY() == 0)
 				.findFirst()
 				.get()
 				.getKey();
 	}
 	
-	private void setEndRooms(Map<Room,Point> roomPositions, int size) {
-		int maxXY = size -1;
-		for (Entry<Room, Point> roomPosition : roomPositions.entrySet()) {
-			int x = (int)roomPosition.getValue().getX();
-			int y = (int)roomPosition.getValue().getY();
-			
-			if (x == 0 || x == maxXY || y == 0 || y == maxXY) {
-				roomPosition.getKey().setEndRoom();
-			}
-		}
+	private void setEndRoom(Map<Room,Point> roomPositions, int size) {
+		int maxXY = size - 1;
+		
+		Room endRoom = roomPositions
+				.entrySet()
+				.stream()
+				.filter(roomEntry -> roomEntry.getValue().getX() == maxXY && roomEntry.getValue().getY() == maxXY)
+				.findFirst()
+				.get()
+				.getKey();
+		
+		endRoom.setEndRoom();
 	}
 	
 	private String getRandomRoomDescription() {
