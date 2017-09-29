@@ -14,8 +14,17 @@ import java.util.Stack;
  *
  */
 public class Maze {
+	private static final String[] ROOM_DESCRIPTIONS = { 
+			"in an empty room",
+			"in a bathroom",
+			"in a very warm room",
+			"in a room full of weapons",
+			"confused, what type of room this is",
+			"in a long gallery full of disturbing pictures",
+			"in a torture chamber",
+			"feeling unwell. It may be from the bad air in this roomgo"
+		};
 	private static final int MIN_SIZE = 2;
-	private static final String[] ROOM_DESCRIPTIONS = { "in an empty room" };
 	private static final Random random = new Random();
 	private final int size;
 	private Map<Room, Point> roomPositions;

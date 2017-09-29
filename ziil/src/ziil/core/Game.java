@@ -37,9 +37,6 @@ public class Game
         parser = new Parser();
     }
 
-    /**
-     * Create all the rooms and link their exits together.
-     */
     private void createRooms()
     {
     	Maze maze = new Maze(MAZE_SIZE);
@@ -65,14 +62,9 @@ public class Game
         System.out.println("Thank you for playing. Good bye.");
     }
 
-    /**
-     * Print out the opening message for the player.
-     */
     private void printWelcome()
     {
-        System.out.println();
-        System.out.println("Welcome to the World of Zuul!");
-        System.out.println("World of Zuul is a new, incredibly boring adventure game.");
+        System.out.println("Welcome to Ziil!\nYou find yourself in an underground labyrinth. Find the exit!");
         System.out.println("Type '" + HELP_COMMAND + "' if you need help.\n");
         System.out.println(getRoomDescription(currentRoom, currentDirection));
     }
@@ -107,26 +99,13 @@ public class Game
     	return finished;
     }
 
-    // implementations of user commands:
-
-    /**
-     * Print out some help information.
-     * Here we print some stupid, cryptic message and a list of the 
-     * command words.
-     */
     private void printHelp() 
     {
-        System.out.println("You are lost. You are alone. You wander");
-        System.out.println("around at the university.");
-        System.out.println();
+        System.out.println("You are lost in an underground maze.");
         System.out.println("Your command words are: " + GO_COMMAND + " " + QUIT_COMMAND + " " + HELP_COMMAND
         		+ " " + EVALUATE_COMMAND);
     }
 
-    /** 
-     * Try to go to one direction. If there is an exit, enter the new
-     * room, otherwise print an error message.
-     */
     private boolean goRoom(Command command) 
     {
         if(!command.hasSecondWord()) {
@@ -164,15 +143,15 @@ public class Game
     	PathFinder pathFinder = new PathFinder();
     	Optional<Integer> pathLength = pathFinder.calculateShortestPathLength(currentRoom, endRoom);
     	if (pathLength.isPresent()) {
-    		System.out.println("The shortest path to the end are " + pathLength.get() + " doors.");
+    		System.out.println("Only " + pathLength.get() + " doors to the exit!");
     	} else {
-    		System.out.println("Can't find a path to the end!");
+    		System.out.println("Can't find a path to the exit!");
     	}
     }
 
     private String getRoomDescription(Room room, AbsoluteDirection direction)
     {
-        String returnString = "You are " + room.getDescription() + ".\nExits:";
+        String returnString = "You are " + room.getDescription() + ".\nPossible doors:";
         Set<AbsoluteDirection> keys = room.getExits();
         for(AbsoluteDirection exit : keys) {
             returnString += " " + RelativeDirection.fromAbsoluteDirections(direction, exit).toString();
